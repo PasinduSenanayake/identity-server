@@ -1,9 +1,11 @@
 import { Router } from 'express';
-import sample from './routes/sample';
+import userRouter from './routes/User';
+import clientRouter from './routes/Client';
 
 // guaranteed to get dependencies
 export default () => {
 	const router = Router();
-	sample(router);
+	clientRouter(router);
+	userRouter(router);
 	return router
 }
