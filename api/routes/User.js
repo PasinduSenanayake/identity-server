@@ -1,12 +1,14 @@
 
 import { Router} from 'express';
 import UserService from '../../service/User';
-const route = Router();
+const privateRoute = Router();
+const publicRoute = Router();
 
 export default (app) => {
- app.use('/private/users/:userId', route);
+ app.use('/private/users/:userId', privateRoute);
+ app.use('/public/users/:userId', publicRoute);
 
- route.get(
+ privateRoute.get(
    '/',
    async (req,res,next) => {
      try {
