@@ -3,7 +3,6 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import routes from './api';
-import authorizer from './auth';
 import config from './config';
 const app = express();
   /**
@@ -32,9 +31,7 @@ const app = express();
   app.use(bodyParser.json());
   // Load API routes
 
-  app.use(config.api.prefix+"/v1/public/*",authorizer(false));
-  app.use(config.api.prefix+"/v1/private/*",authorizer(true));
-  app.use(config.api.prefix+"/v1/",routes())
+  app.use(config.api.prefix+"/v1/",routes());
 
   //sample API calls
   //http://localhost:3000/api/v1/private/users/1212121
