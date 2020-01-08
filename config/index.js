@@ -9,12 +9,14 @@ export default {
 
   //port: parseInt(process.env.PORT, 3000),
 
-port: parseInt(3000),
+  port: parseInt(3000),
   /**
    * API configs
    */
   api: {
     prefix: '/api',
   },
+
+  salt:parseInt(30)
 
 };

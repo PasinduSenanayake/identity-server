@@ -31,7 +31,7 @@ const app = express();
   app.use(bodyParser.json());
   // Load API routes
 
-  app.use(config.api.prefix+"/v1/",routes());
+  app.use(config.api.prefix+"/v1/identity",routes());
 
   //sample API calls
   //http://localhost:3000/api/v1/private/users/1212121
