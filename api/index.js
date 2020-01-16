@@ -17,18 +17,15 @@ export default () => {
 
 /*application-id application-secret
 GET v1/identity/applications/:application-id/
-POST v1/identity/applications/:applicationId/generate-auth-token
-POST v1/identity/applications/:applicationId/refresh-auth-token
+POST v1/identity/applications/:applicationId/authorize
 POST v1/identity/applications
 
 client-id client-secret
 GET v1/identity/applications/:applicationId/clients/:client-id/
-POST v1/identity/applications/:applicationId/clients/:client-id/generate-auth-token
-POST v1/identity/applications/:applicationId/clients/:client-id/refresh-auth-token
+POST v1/identity/applications/:applicationId/clients/:client-id/authorize
 POST v1/identity/applications/:applicationId/clients
 
-POST v1/identity/applications/:application-id/users
-POST v1/identity/applications/:application-id/users/:user-id/refresh-auth-token
-POST v1/identity/applications/:application-id/users/:user-id/validate
-GET v1/identity/applications/:application-id/users/:user-id/generate-oauth-token
-GET v1/identity/applications/:application-id/users/:user-id*/
+POST v1/identity/applications/:applicationId/users
+POST v1/identity/applications/:applicationId/users/:userId/authorize
+GET v1/identity/applications/:applicationId/users/:userId/generate-oauth-token
+GET v1/identity/applications/:applicationId/users/:userId*/
