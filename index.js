@@ -49,7 +49,7 @@ app.use((err, req, res, next) => {
   /**
    * Handle 401 thrown by express-jwt library
    */
-  if (err.name === 'UnauthorizedError') {
+  if (err.name === 'UnauthorizedError'||err.name === 'BadRequestError' ) {
     return res
       .status(err.status)
       .send({ message: err.message })

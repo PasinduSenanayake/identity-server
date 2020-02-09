@@ -4,15 +4,16 @@ export default class AuthClient{
 
     constructor(entity) {
         AuthClient.model = entity.define('auth_client', {
-            entityId: {
+            authClientPrimaryId: {
                 type: Sequelize.STRING,
-                field: 'entity_id',
+                field: 'auth_client_primary_id',
                 primaryKey: true,
             },
             clientId: {
                 type: Sequelize.STRING,
                 field: 'client_id'
             },
+
             clientSecret: {
                 type: Sequelize.STRING,
                 field: 'client_secret'
@@ -21,15 +22,10 @@ export default class AuthClient{
                 type: Sequelize.STRING,
                 field: 'client_type'
             },
-            clientAuthorizer:{
-                type:Sequelize.STRING,
-                field: 'client_authorizer'
-            },
-            userAuthorizer:{
+            status: {
                 type: Sequelize.STRING,
-                field: 'user_authorizer'
-
-            }
+                field: 'status'
+            },
 
         });
 

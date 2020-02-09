@@ -17,7 +17,7 @@ export default {
     prefix: '/api',
   },
 
-  salt:parseInt(30),
+  salt:parseInt(2),
 
   passPhrase:process.env.PASS_PHRASE || "passphrase"
 

@@ -5,6 +5,8 @@ export const generateRandomStringList = (listLength, isSpread = false)=>{
         randomStringList.push( Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15))
     }
 
-    return (isSpread)?{...randomStringList}:randomStringList;
+    return (isSpread)?[...randomStringList]:randomStringList;
 
-}
+};
+
+export const nullCheck = (data)=> (data===null ||typeof data ==="undefined");
