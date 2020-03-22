@@ -19,6 +19,12 @@ export default {
 
   salt:parseInt(2),
 
-  passPhrase:process.env.PASS_PHRASE || "passphrase"
+  passPhrase:process.env.PASS_PHRASE || "passphrase",
 
+  databaseConfig:{
+    database:"identity_db",
+    user:"root",
+    password:"root",
+    host:"localhost"
+  }
 };

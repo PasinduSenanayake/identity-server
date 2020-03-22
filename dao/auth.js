@@ -1,17 +1,12 @@
-
+import EntityManager from '../resource/dbManager';
+import authClient from '../model/authClient';
 class AuthDao {
 
 
-    getAuthClient() {
-        return {
-            "clientSecret":"$2b$04$OrYz2Vtr8p8eygt2Kk5xTOpAJfM1sRgfNDTJ9xOpuA4oJJFcpKbh."
-        }
+    async getAuthClientByClientId(clientId) {
+        const authClientResponse = await EntityManager.getEntity(authClient).findOne({where: {clientId: clientId}, raw:true});
+        return authClientResponse;
     }
-    createAuthClient(authClient){
-        return {"authClientPrimaryId":10}
-
-    }
-
 
 }
 

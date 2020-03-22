@@ -1,4 +1,4 @@
-
+import Sequelize from 'sequelize';
 
 export default class User{
 
@@ -27,6 +27,9 @@ export default class User{
                 field: 'status'
             }
 
+        },{
+            tableName:'user',
+            timestamps: false
         });
 
         return User.model

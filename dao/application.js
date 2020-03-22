@@ -1,20 +1,29 @@
-
+import EntityManager from '../resource/dbManager';
+import Application from '../model/application';
+import AuthClient from '../model/authClient'
 class ApplicationDao {
 
 
-    getApplication() {
-        return {"authClientId":10,"applicationKey":"62dc904e45f231259140e2406a19d88cc8a865f298cb98ce5780986f3aac332b5423e87a4d4a34e80b10fc9829a924fd2f99b1129fa73f6a99c84e4273ef42d9395ae3c083420d86f12643ae970946d2baf082ff992abc819fd274d2297ec18a280573f36554a9d8093cc934d3a02f0e8d4be53678eb"}
+    async getApplicationByApplicationId(applicationId) {
+       const applicationResponse =  await EntityManager.getEntity(Application).findOne({where:{applicationId:applicationId}, raw:true});
+       return applicationResponse;
     }
 
-    createApplication(){
-
+    async createApplication(applicationData, authClientData) {
+        
+        let applicationResponse = {}
+        await EntityManager.executeTransaction(async (transaction) => {
+            const response = await EntityManager.getEntity(AuthClient).create(authClientData, { transaction: transaction });
+            applicationResponse = await EntityManager.getEntity(Application).create({ ...applicationData, authClientId: response.get()["authClientPrimaryId"] },
+                { transaction: transaction });
+        });
+        return applicationResponse.get();
     }
 
-    getApplicationByAuthClientId(authClientId){
-        return {"applicationId":"121"}
+    async getApplicationByAuthClientId(authClientId) {
+        const applicationResponse = await EntityManager.getEntity(Application).findOne({where:{authClientId:authClientId}, raw:true});
+        return applicationResponse;
     }
-
-
 }
 
 export default new ApplicationDao();

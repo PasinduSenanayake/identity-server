@@ -1,5 +1,6 @@
-
-
+import Sequelize from 'sequelize';
+import EntityManager from '../resource/dbManager'
+import AuthClient from './authClient'
 export default class Application{
 
     constructor(entity) {
@@ -8,6 +9,7 @@ export default class Application{
                 type: Sequelize.STRING,
                 field: 'application_id',
                 primaryKey: true,
+                autoIncrement:true
             },
             authClientId: {
                 type: Sequelize.STRING,
@@ -27,21 +29,27 @@ export default class Application{
             },
             userKey:{
                 type: Sequelize.STRING,
-                field: 'user_key'
+                field: 'user_key',
+                allowNull: false
             },
             status: {
-                type: Sequelize.STRING,
-                field: 'status'
+                type: Sequelize.INTEGER,
+                field: 'status',
+                allowNull: false,
+                defaultValue: 1
             },
 
+        },{
+            tableName:'application',
+            timestamps: false,
         });
 
-        return Application.model
+        return Application.model;
 
     }
 
     static relationships(){
-
+        Application.model.hasOne(EntityManager.getEntity(AuthClient),{foreignKey: 'authClientPrimaryId'})  
     }
 
 

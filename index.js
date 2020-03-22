@@ -4,6 +4,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import routes from './api';
 import config from './config';
+import dbManger from './resource/dbManager';
+
 const app = express();
   /**
    * Health Check endpoints
@@ -67,6 +69,7 @@ app.use((err, req, res, next) => {
     });
   });
 
-  app.listen(3000, () =>
-    console.log('Example app listening on port: ',config.port),
-  );
+  app.listen(3000, () => {
+    dbManger.init();
+    console.log('Example app listening on port: ',config.port);
+  });

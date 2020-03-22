@@ -16,20 +16,7 @@ class AuthorizationService {
         const user = UserDao.getUser(userId);
         return (tokenData["tokenType"]==="refresh" && user["applicationId"] === applicationId )
     }
-    authorizeApplicationTokenRequest(tokenData, requestParams){
-
-        return {"isValidPayload":true, "payload":null}
-    }
-
-    authorizeClientTokenRequest(tokenData, requestParams){
-
-        const userId = requestParams["userId"];
-        const applicationId = requestParams["applicationId"];
-        const user = UserDao.getUser(userId);
-
-        return {"isValidPayload":true, "payload":null}
-    }
-
+    
     authorizeUserDetailsRequest(userId){
         return {"isValidPayload":true, "payload":payload}
     }

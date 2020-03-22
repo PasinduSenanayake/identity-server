@@ -17,7 +17,9 @@
     "cryptr": "^6.0.1",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
-    "nodemon": "^1.19.2"
+    "mysql2": "^2.1.0",
+    "nodemon": "^1.19.2",
+    "sequelize": "^5.21.5"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",

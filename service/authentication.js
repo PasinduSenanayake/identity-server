@@ -4,22 +4,23 @@ import Cryptr from 'cryptr'
 import config from '../config'
 import AuthDao from "../dao/auth";
 import ApplicationDao from "../dao/application"
-import ClientDao from "../dao/client";
+import ApplicationClientDao from "../dao/applicationClient";
 import {generateRandomStringList, nullCheck} from "../util/authUtil";
 
 
 class AuthService {
 
 
-    getTokenSignString(applicationId, audience) {
-        const application = ApplicationDao.getApplication(applicationId);
+    async getTokenSignString(applicationId, audience) {
+        const application = await ApplicationDao.getApplicationByApplicationId(applicationId);
         const cryptr = new Cryptr("passPhrase");
         return cryptr.decrypt(application[audience + "Key"]);
     }
 
-    createToken(payload, applicationId, audience) {
+   async createToken(payload, applicationId, audience) {
         try {
-            return jwt.sign(payload, this.getTokenSignString(applicationId, audience), {
+            const tokenString = await this.getTokenSignString(applicationId, audience)
+            return jwt.sign(payload, tokenString, {
                 algorithm: 'HS384',
                 expiresIn: '1h',
                 audience: audience
@@ -29,7 +30,7 @@ class AuthService {
         }
     }
 
-    validateToken(applicationId, token, audienceList) {
+    async validateToken(applicationId, token, audienceList) {
         try {
 
             const decoded = jwt.decode(token, {complete: true});
@@ -40,7 +41,8 @@ class AuthService {
             const audienceData = decoded["payload"]["aud"];
 
             if (audienceList.includes(audienceData)) {
-                const data = jwt.verify(token, this.getTokenSignString(applicationId, audienceData), {
+                const tokenString = await this.getTokenSignString(applicationId, audienceData)
+                const data = jwt.verify(token, tokenString, {
                     algorithm: 'HS384',
                     audience: audienceData
                 });
@@ -52,23 +54,25 @@ class AuthService {
                 }
             }
 
-            return {'isAuthenticated': false,}
-
+           
         } catch (error) {
             console.log(error);
         }
+
+        return {'isAuthenticated': false}
+
     }
 
-    isRequestEntityValid(authenticatedData, params) {
+    isRequestEntityValid(authenticatedData, params={}) {
         switch (authenticatedData["audience"]) {
 
             case "application":
-                if (params.contains("clientId") && params["clientId"] !== authenticatedData["entityData"]["clientId"]) {
+                if ({}.hasOwnProperty(params,"clientId") && params["clientId"] !== authenticatedData["entityData"]["clientId"]) {
                     return false;
                 }
                 break;
             case "client":
-                if (params.contains("clientId") && params["clientId"] !== authenticatedData["entityData"]["clientId"]) {
+                if ({}.hasOwnProperty(params,"clientId") && params["clientId"] !== authenticatedData["entityData"]["clientId"]) {
                     return false;
                 }
                 break;
@@ -84,19 +88,17 @@ class AuthService {
 
     }
 
-    createAuthClient(entityType) {
+    async createAuthClient(entityType) {
         try{
             const [clientId, secretUUID] = generateRandomStringList(2, true);
             const secret = hashSync(secretUUID, config.salt);
 
             const authClient = {
-                "entityId": clientId,
-                "clientSecret": secret,
+                "clientId": clientId,
+                "clientSecretHashed": secret,
+                "clientSecret": secretUUID,
                 "entityType": entityType
             };
-
-            const authClientEntity = {};
-            authClientEntity["authClientId"] = AuthDao.createAuthClient(authClient)["authClientPrimaryId"];
 
             if (entityType === "application") {
                 const [applicationKey, clientKey, userKey] = generateRandomStringList(3, true);
@@ -104,13 +106,12 @@ class AuthService {
 
                 return {
                     ...authClient,
-                    "clientSecret": secretUUID,
                     "applicationKey": cryptr.encrypt(applicationKey),
                     "clientKey": cryptr.encrypt(clientKey),
                     "userKey": cryptr.encrypt(userKey)
                 }
             }
-            return authClientEntity
+            return authClient;
         }
         catch (e) {
             console.log(e)
@@ -118,23 +119,30 @@ class AuthService {
 
     }
 
-    validateClientCredentials(id, secret,applicationId,audienceList) {
+    async validateClientCredentials(clientId,secret,applicationId,audienceList) {
 
-        let entity = {};
-        const authClient = AuthDao.getAuthClient(entity["clientId"]);
-        switch (audienceList[0]) {
+        try {
+            let entity = {};
+            const authClient = await AuthDao.getAuthClientByClientId(clientId);
 
-            case "client":
-                entity = ClientDao.getClientByAuthClientId(authClient["authClientPrimaryId"]);
-                break;
-
-            case "application":
-                entity = ApplicationDao.getApplicationByAuthClientId(authClient["authClientPrimaryId"]);
-                break;
-
-        }
-        if (entity["applicationId"].toString() === applicationId && compareSync(secret, authClient["clientSecret"])) {
-            return {'isAuthenticated': true, audience: audienceList[0],"applicationId":applicationId, "entityData": entity}
+            for (let audience of audienceList) {
+                switch (audience) {
+    
+                    case "client":
+                        entity = await ApplicationClientDao.getApplicationClientByAuthClientId(authClient["authClientPrimaryId"]);
+                        break;
+        
+                    case "application":
+                        entity = await ApplicationDao.getApplicationByAuthClientId(authClient["authClientPrimaryId"]);
+                        break;
+        
+                }
+                if (entity["applicationId"].toString() === applicationId && compareSync(secret, authClient["clientSecret"])) {
+                    return {'isAuthenticated': true, 'audience': audience,"applicationId":applicationId, "entityData": entity}
+                }
+            }
+        }catch(e){
+            console.log(e);
         }
         return {'isAuthenticated': false}
     }

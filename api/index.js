@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import UserRouter from './routes/user';
-import ClientRouter from './routes/client';
+import ApplicationClientRouter from './routes/applicationClient';
 import ApplicationRouter from './routes/application'
 
 // guaranteed to get dependencies
@@ -8,7 +8,7 @@ export default () => {
 
 	const router = Router();
 
-	router.use("/applications/:applicationId/clients",ClientRouter());
+	router.use("/applications/:applicationId/clients",ApplicationClientRouter());
 	router.use("/applications/:applicationId/users",UserRouter());
 	router.use("/applications",ApplicationRouter());
 

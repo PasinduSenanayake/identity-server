@@ -2,7 +2,6 @@ import {Router} from 'express';
 import ApplicationService from "../../service/application";
 import AuthenticationService from "../../service/authentication";
 import Authorizer from '../../middleware/auth';
-import authorizationService from "../../service/authorization";
 
 
 export default () => {
@@ -12,7 +11,7 @@ export default () => {
     applicationRouter.get('/:applicationId', Authorizer("accessToken", ["application"]),
         async (req, res, next) => {
             try {
-                const applicationDetails = await ApplicationService.getApplication(applicationId);
+                const applicationDetails = await ApplicationService.getApplication(req.params.applicationId);
                 return res.status(200).json(applicationDetails);
             } catch (e) {
                 return next(e);
@@ -23,9 +22,10 @@ export default () => {
     applicationRouter.post('/', async (req, res, next) => {
             try {
                 const authDetails = await AuthenticationService.createAuthClient("application");
-                await ApplicationService.registerApplication(req.body, authDetails);
+                const applicationId = await ApplicationService.registerApplication(req.body, authDetails);
                 return res.status(200).json({
-                    "clientId": authDetails["entityId"],
+                    "applicationId":applicationId,
+                    "clientId": authDetails["clientId"],
                     "clientSecret": authDetails["clientSecret"]
                 });
             } catch (e) {

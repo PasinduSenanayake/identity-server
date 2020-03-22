@@ -10,12 +10,18 @@ class ApplicationService {
             "clientKey": authDetails.clientKey,
             "userKey": authDetails.userKey
         };
-        await ApplicationDao.createApplication(application);
+        const authClient = {
+            "clientId": authDetails.clientId,
+            "clientSecret": authDetails.clientSecretHashed,
+            "entityType": authDetails.entityType
+        }
+        const applicationData = await ApplicationDao.createApplication(application, authClient);
+        return applicationData.applicationId;
     }
 
     async getApplication(applicationId) {
 
-        const application = await ApplicationDao.getApplication(applicationId);
+        const application = await ApplicationDao.getApplicationByApplicationId(applicationId);
 
         delete application["applicationKey"];
         delete application["clientKey"];
@@ -27,7 +33,7 @@ class ApplicationService {
 
 
     static async updateApplication(props) {
-        return {'isAuthRequired': true, 'isAuthenticated': true, 'clams': {}}
+        return { 'isAuthRequired': true, 'isAuthenticated': true, 'clams': {} }
     }
 
 }
