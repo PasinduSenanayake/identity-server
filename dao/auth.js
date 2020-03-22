@@ -1,10 +1,10 @@
 import EntityManager from '../resource/dbManager';
-import authClient from '../model/authClient';
+import AuthClient from '../model/authClient';
 class AuthDao {
 
 
     async getAuthClientByClientId(clientId) {
-        const authClientResponse = await EntityManager.getEntity(authClient).findOne({where: {clientId: clientId}, raw:true});
+        const authClientResponse = await EntityManager.getEntity(AuthClient).findOne({where: {clientId: clientId}, raw:true});
         return authClientResponse;
     }
 

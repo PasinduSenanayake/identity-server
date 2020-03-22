@@ -23,8 +23,8 @@ export default () => {
     applicationClientRouter.get('/:clientId', Authorizer("accessToken", ["client", "application"]),
         async (req, res, next) => {
             try {
-                const client = await ApplicationClientService.getApplicationClient(clientId);
-                return res.status(200).json(client);
+                const applicationClient = await ApplicationClientService.getApplicationClient(clientId);
+                return res.status(200).json(applicationClient);
             } catch (e) {
                 return next(e);
             }
