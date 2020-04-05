@@ -23,7 +23,7 @@ export default class AuthClient{
             },
             entityType:{
                 type: Sequelize.STRING,
-                 allowNull: false,
+                allowNull: false,
                 field: 'entity_type'
             },
             status: {

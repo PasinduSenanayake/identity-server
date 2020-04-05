@@ -2,9 +2,9 @@ import express from 'express';
 
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import routes from './api';
-import config from './config';
-import dbManger from './resource/dbManager';
+import routes from './src/api';
+import config from './src/config';
+import dbManger from './src/resource/dbManager';
 
 const app = express();
   /**
