@@ -24,8 +24,7 @@ export default (authType,audienceList) => {
         else if(!AuthenticationService.isRequestEntityValid(req['authDetails'],req.params)){
             return next({name: 'BadRequestError', status: 400, "message": InvalidRequestMessage})
         }
-
-
+        
         return next();
     }
     

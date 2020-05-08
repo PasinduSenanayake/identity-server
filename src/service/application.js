@@ -5,7 +5,6 @@ class ApplicationService {
     async registerApplication(applicationDetails, authDetails) {
         const application = {
             "applicationName": applicationDetails.applicationName,
-            "authClientId": authDetails.authClientPrimaryId,
             "applicationKey": authDetails.applicationKey,
             "clientKey": authDetails.clientKey,
             "userKey": authDetails.userKey
@@ -21,14 +20,18 @@ class ApplicationService {
 
     async getApplication(applicationId) {
 
-        const application = await ApplicationDao.getApplicationByApplicationId(applicationId);
-
+        const application = await ApplicationDao.getApplicationByAttribute("applicationId",applicationId);
         delete application["applicationKey"];
         delete application["clientKey"];
         delete application["userKey"];
         return application;
 
 
+    }
+
+    async getApplicationByApplicationName(applicationName){
+        const application = await ApplicationDao.getApplicationByAttribute("applicationName",applicationName);
+        return application;
     }
 
 

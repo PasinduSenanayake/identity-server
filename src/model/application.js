@@ -41,7 +41,7 @@ export default class Application{
 
         },{
             tableName:'application',
-            timestamps: false,
+            timestamps: true,
         });
 
         return Application.model;

@@ -1,6 +1,8 @@
 import EntityManager from '../resource/dbManager';
 import ApplicationClient from '../model/applicationClient';
 import AuthClient from '../model/authClient'
+import DatabaseException from '../exception/databaseException';
+import { ApplicationClientCreationFailed, ApplicationClientFetchFailed } from '../exception/exceptionCode';
 
 
 class ApplicationClientDao {
@@ -10,7 +12,7 @@ class ApplicationClientDao {
         try{
             return {}
         }catch (error) {
-            throw new DatabaseException();
+            throw new DatabaseException(error);
         }
         
     }
@@ -19,7 +21,7 @@ class ApplicationClientDao {
         try{
             return []
         }catch (error) {
-            throw new DatabaseException();
+            throw new DatabaseException(error);
         }
      
     }
@@ -35,7 +37,7 @@ class ApplicationClientDao {
             });
             return applicationClientResponse.get();
         }catch (error) {
-            throw new DatabaseException();
+            throw new DatabaseException(ApplicationClientCreationFailed,error);
         }
         
 
@@ -45,7 +47,8 @@ class ApplicationClientDao {
         try{
             return {"applicationId":"121"}
         }catch (error) {
-            throw new DatabaseException();
+            
+            throw new DatabaseException(ApplicationClientFetchFailed,error);
         }
         
     }

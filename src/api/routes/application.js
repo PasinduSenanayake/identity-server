@@ -2,6 +2,7 @@ import {Router} from 'express';
 import ApplicationService from "../../service/application";
 import AuthenticationService from "../../service/authentication";
 import Authorizer from '../../middleware/auth';
+import Validator from '../../middleware/requestValidator';
 
 
 export default () => {
@@ -19,12 +20,13 @@ export default () => {
         },
     );
 
-    applicationRouter.post('/', async (req, res, next) => {
+    applicationRouter.post('/',Validator("application",["attributes","duplication"]), async (req, res, next) => {
             try {
-                const authDetails = await AuthenticationService.createAuthClient("application");
+                const authDetails = await AuthenticationService.generateAuthClient("application");
                 const applicationId = await ApplicationService.registerApplication(req.body, authDetails);
                 return res.status(200).json({
                     "applicationId":applicationId,
+                    "applicationName":req.body.applicationName,
                     "clientId": authDetails["clientId"],
                     "clientSecret": authDetails["clientSecret"]
                 });

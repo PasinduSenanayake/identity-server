@@ -21,5 +21,14 @@ export const createUnauthenticatedMessage = (authType,isInternalError) =>{
     return (authType === "clientCredentials")?InvalidOrErrorClientCredentialMessage:InvalidOrErrorTokenMessage;
 }
 
+export const isJson = (jsonObj)=>{
+    try {
+        JSON.stringify(jsonObj);
+        return true;
+    }catch(e){
+        return false;
+    }
+}
+
 
 

@@ -5,6 +5,7 @@ import config from '../config'
 import AuthDao from "../dao/auth";
 import ApplicationDao from "../dao/application"
 import ApplicationClientDao from "../dao/applicationClient";
+import ApplicationUserDao from '../dao/applicationUser';
 import { generateRandomStringList, nullCheck } from "../util/authUtil";
 import AuthenticationException from '../exception/authenticationException';
 import { TokenCreationFailed, TokenValidationFailed, 
@@ -17,7 +18,7 @@ class AuthService {
 
 
     async getTokenSignString(applicationId, audience) {
-        const application = await ApplicationDao.getApplicationByApplicationId(applicationId);
+        const application = await ApplicationDao.getApplicationByAttribute("applicationId",applicationId);
         const cryptr = new Cryptr("passPhrase");
         return cryptr.decrypt(application[audience + "Key"]);
     }
@@ -30,7 +31,7 @@ class AuthService {
                 expiresIn: '1h',
                 audience: audience
             });
-        } catch (error) {
+        } catch (error) { 
             throw new AuthenticationException(TokenCreationFailed, error);
         }
     }
@@ -81,6 +82,11 @@ class AuthService {
                         return false;
                     }
                     break;
+                case "resource":
+                    if ({}.hasOwnProperty(params, "resourceId") && params["resourceId"] !== authenticatedData["entityData"]["resourceId"]) {
+                        return false;
+                    }
+                    break;    
                 case "client":
                     if ({}.hasOwnProperty(params, "clientId") && params["clientId"] !== authenticatedData["entityData"]["clientId"]) {
                         return false;
@@ -88,7 +94,7 @@ class AuthService {
                     break;
 
                 case "user":
-                    if (params["userId"] !== authenticatedData["entityData"]["userId"]) {
+                    if ({}.hasOwnProperty(params, "userId") && params["userId"] !== authenticatedData["entityData"]["applicationUserPrimaryId"]) {
                         return false;
                     }
                     break;
@@ -102,30 +108,47 @@ class AuthService {
 
     }
 
-    async createAuthClient(entityType) {
+    async generateAuthClient(entityType,authInfo={}) {
 
-        const [clientId, secretUUID] = generateRandomStringList(2, true);
-        const secret = hashSync(secretUUID, config.salt);
-
-        const authClient = {
-            "clientId": clientId,
-            "clientSecretHashed": secret,
-            "clientSecret": secretUUID,
-            "entityType": entityType
-        };
-
-        if (entityType === "application") {
-            const [applicationKey, clientKey, userKey] = generateRandomStringList(3, true);
-            const cryptr = new Cryptr("passPhrase");
-
-            return {
-                ...authClient,
-                "applicationKey": cryptr.encrypt(applicationKey),
-                "clientKey": cryptr.encrypt(clientKey),
-                "userKey": cryptr.encrypt(userKey)
-            }
+        const authClient = {}
+        switch (entityType){
+            case "application":
+            case "applicationClient":
+                const [clientGeneratedId, secretUUID] = generateRandomStringList(2, true);
+                authClient["clientId"] = clientGeneratedId;
+                authClient["clientSecretHashed"] = hashSync(secretUUID, config.salt);
+                authClient["clientSecret"] = secretUUID;
+                authClient["entityType"] = entityType;
+                break;
+            case "applicationUser":
+                authClient["clientId"] = authInfo["userIdentifier"]
+                authClient["clientSecretHashed"] = hashSync(authInfo["userSecret"], config.salt);
+                authClient["entityType"] = entityType;
+                break;
         }
-        return authClient;
+
+    
+        switch (entityType){
+            case "application":
+                const [applicationKey, clientKey, userKey] = generateRandomStringList(4, true);
+                const cryptr = new Cryptr("passPhrase");
+
+                return {
+                    ...authClient,
+                    "applicationKey": cryptr.encrypt(applicationKey),
+                    "clientKey": cryptr.encrypt(clientKey),
+                    "userKey": cryptr.encrypt(userKey)
+                    }
+
+            
+            case "applicationUser":
+            case "applicationClient":    
+                return authClient
+            
+            default:   
+                return authClient;
+        }
+     
 
     }
 
@@ -143,8 +166,12 @@ class AuthService {
                         break;
 
                     case "application":
-                        entity = await ApplicationDao.getApplicationByAuthClientId(authClient["authClientPrimaryId"]);
+                        entity = await ApplicationDao.getApplicationByAttribute("authClientId",authClient["authClientPrimaryId"]);
                         break;
+
+                    case "user":
+                        entity = await ApplicationUserDao.getUserByAttributes({"authClientId":authClient["authClientPrimaryId"]});
+                        break;    
 
                 }
                 if (entity["applicationId"].toString() === applicationId && compareSync(secret, authClient["clientSecret"])) {

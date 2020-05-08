@@ -34,7 +34,7 @@ export default () => {
     applicationClientRouter.post('/', Authorizer("accessToken", ["application"]),
         async (req, res, next) => {
             try {
-                const authDetails = await AuthService.createAuthClient("client");
+                const authDetails = await AuthService.generateAuthClient("applicationClient");
                 const applicationClientId = await ApplicationClientService.registerApplicationClient(req.params.applicationId,req.body, authDetails);
                 return res.status(200).json({
                     "applicationClientId":applicationClientId,

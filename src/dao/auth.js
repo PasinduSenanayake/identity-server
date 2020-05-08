@@ -1,5 +1,6 @@
 import EntityManager from '../resource/dbManager';
 import AuthClient from '../model/authClient';
+import DatabaseException from '../exception/databaseException';
 class AuthDao {
 
 
