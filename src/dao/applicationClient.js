@@ -8,20 +8,24 @@ import { ApplicationClientCreationFailed, ApplicationClientFetchFailed } from '.
 class ApplicationClientDao {
 
 
-    async getClientByClientId(clientId) {
+    async getClientByAttributes(attributesMap) {
         try{
-            return {}
+            const response = await EntityManager.getEntity(ApplicationClient).findOne({ 
+                where: attributesMap, raw: true });
+            return response;
         }catch (error) {
-            throw new DatabaseException(error);
+            throw new DatabaseException(ApplicationClientFetchFailed,error);
         }
         
     }
 
-    async getAllClients(){
+    async getAllClientsByAttributes(attributesMap){
         try{
-            return []
+            const response = await EntityManager.getEntity(ApplicationClient).findAll({ 
+                where: attributesMap, raw: true });
+            return response;
         }catch (error) {
-            throw new DatabaseException(error);
+            throw new DatabaseException(ApplicationClientFetchFailed,error);
         }
      
     }

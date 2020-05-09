@@ -12,8 +12,8 @@ export default () => {
     applicationClientRouter.get('/', Authorizer("accessToken", ["application"]),
         async (req, res, next) => {
             try {
-                const clientList = await ApplicationClientService.getAllApplicationClients(applicationId);
-                return res.status(200).json(clientList);
+                const applicationClientList = await ApplicationClientService.getAllApplicationClientsByApplicationId(req.params.applicationId);
+                return res.status(200).json(applicationClientList);
             } catch (e) {
                 return next(e);
             }
@@ -23,7 +23,8 @@ export default () => {
     applicationClientRouter.get('/:clientId', Authorizer("accessToken", ["client", "application"]),
         async (req, res, next) => {
             try {
-                const applicationClient = await ApplicationClientService.getApplicationClient(clientId);
+                const applicationClient = await ApplicationClientService.getAllApplicationClientsByApplicationId(req.params.clientId,
+                    req.params.applicationId);
                 return res.status(200).json(applicationClient);
             } catch (e) {
                 return next(e);
@@ -41,6 +42,17 @@ export default () => {
                     "clientId": authDetails["clientId"],
                     "clientSecret": authDetails["clientSecret"]
                 });
+            } catch (e) {
+                return next(e);
+            }
+        },
+    );
+
+    applicationClientRouter.post('/:clientId/addUsers', Authorizer("accessToken", ["application"]),
+        async (req, res, next) => {
+            try {
+                const response = await ApplicationClientService.createApplicationClientUsers(req.body.users, req.params.clientId, req.params.applicationId);
+                return res.status(200).json(response);
             } catch (e) {
                 return next(e);
             }

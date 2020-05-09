@@ -16,13 +16,33 @@ class ApplicationClientService {
         return applicationClientResponse.applicationClientPrimaryId
     }
 
-    async getApplicationClient(clientId) {
-        const applicationClient = await ApplicationClientDao.getClient(clientId);
+    async createApplicationClientUsers(applicationClientUsers, applicationClientId,applicationId) {
+
+        const applicationClientUserList = applicationClientUsers.map(applicationClientUser => {
+            return {
+                applicationUserPrimaryId:applicationClientUser.applicationUserId,
+                applicationClientPrimaryId: applicationClientId,
+                applicationId:applicationId
+             }
+        })
+
+        const response = await ApplicationClientDao.createApplicationClientUsers(applicationClientUserList);
+
+        return response.map(data=>{return {
+            applicationUserId: data["applicationUserPrimaryId"],
+            applicationClientId:data["applicationClientPrimaryId"],
+            applicationId: data["applicationId"]
+        }});
+    }
+
+    async getApplicationClientIdAndApplicationId(clientId,applicationId) {
+        const applicationClient = await ApplicationClientDao.getClientByAttributes({"applicationId":applicationId,
+        "applicationClientPrimaryId":clientId});
         return applicationClient;
     }
 
-    async getAllApplicationClients(applicationId) {
-        const applicationClientsList = await ApplicationClientDao.getAllClients(applicationId);
+    async getAllApplicationClientsByApplicationId(applicationId) {
+        const applicationClientsList = await ApplicationClientDao.getClientsByAttributes({"applicationId":applicationId});
         return applicationClientsList;
     }
 
